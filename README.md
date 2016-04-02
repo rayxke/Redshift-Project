@@ -2,12 +2,12 @@
 Project for ECE-4813
 
 ##Task List
--[X]Python Script to merge data to one csv file
--[] Load Data to RedShift
--[] Develop SQL Query
--[] Flask App
--[] PowerPoint Presentation
--[] Project Report
+- [X] Python Script to merge data to one csv file
+- [] Load Data to RedShift
+- [] Develop SQL Query
+- [] Flask App
+- [] PowerPoint Presentation
+- [] Project Report
 
 
 ##Assignments
