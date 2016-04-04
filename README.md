@@ -12,6 +12,7 @@ Project for ECE-4813
 ##Assignments
 |Task| Team Member|
 |:---:|:---:|
-|Load Data to RedShift|Insert Name Here |
-|SQL Analysis|Insert Name Here|
+|Format Data| Jason|
+|Load Data to RedShift|Saketh |
+|SQL Analysis|Shivam & Other people|
 |Flask| Keary|
