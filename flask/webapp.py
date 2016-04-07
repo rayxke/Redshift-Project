@@ -5,15 +5,16 @@
      Authors: Shivam Agarwal, Jason Mar, Keary Mobley, Saketh Poda, Carlos Ramirez, Soma Yamaoka
 '''
 
-from flask import Flask
+from flask import Flask, render_template, url_for
 import json, requests
-import boto
+import boto.redshift
 
 app = Flask(__name__)
 
 
 
 '''
+
 Not sure if the below functions are needed. I'm kind of following the templates from these repos
 https://github.com/pallets/flask/tree/master/examples/flaskr
 https://github.com/pallets/flask/tree/master/examples/minitwit
@@ -26,13 +27,20 @@ https://github.com/pallets/flask/tree/master/examples/minitwit
 #def closedb():
     #Close connection to redshift
 
-
 '''
 Here I plan to implement  the api/ queries?
 '''
 
 
-@approute('/')
+@app.route('/')
+def homepage():
+   return render_template('index.html')
+   
 
 
-@approute('/search')
+#@app.route('/search')
+
+#Run the app.
+
+if __name__ == '__main__':
+   app.run()
