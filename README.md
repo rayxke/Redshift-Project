@@ -3,7 +3,7 @@ Project for ECE-4813
 
 ##Task List
 - [x] Python Script to merge data to one csv file
-- [ ]  Load Data to RedShift
+- [x]  Load Data to RedShift
 - [ ]  Develop SQL Query
 - [ ]  Flask App
 - [ ]  PowerPoint Presentation
@@ -15,4 +15,4 @@ Project for ECE-4813
 |Format Data| Jason|
 |Load Data to RedShift|Saketh |
 |SQL Analysis|Shivam & Other people|
-|Flask| Keary|
+|Flask| Keary, Carlos|
