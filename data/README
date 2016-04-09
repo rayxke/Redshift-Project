@@ -1,3 +1,5 @@
 Use the merge_script.py to merge all tag files where each line represents the photo. 
 The tags for the photo are separated by spaces
 
+Use map_reduce_tags.py to run on the mergedtags.txt generated from merge_script.py 
+The map reduced tags file should have 'tag' \t [filenum1, filenum2,...] where each row contains a tag
