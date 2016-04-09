@@ -1,3 +1,5 @@
+#Run this on the mergedtags.txt file generated from the merge_script.py file
+
 from mrjob.job import MRJob
 fh = open("tagsMP.txt","w+")
 count = 0
