@@ -7,8 +7,8 @@
 
 from flask import Flask, render_template, url_for
 import json, requests
-import boto.redshift
-
+import boto
+import psycopg2
 app = Flask(__name__)
 
 
@@ -20,20 +20,40 @@ https://github.com/pallets/flask/tree/master/examples/flaskr
 https://github.com/pallets/flask/tree/master/examples/minitwit
 
 '''
-#def connectdb():
-    #Connects to redshift
 
+#Connects to redshift
+red_conn = boto.connect_redshift(aws_access_key_id=key_id, aws_secret_access_key=secret_id)
+pconn = psycopg2.connect("host= '"+addr+"' port='5439' dbname='"+databasename+"' user='"+username+"' password='"+password+"'")
+
+
+'''select count(*) as modelcount, modelt.modelval as modelval from (select exifmodel.val as modelval, selecttagt.filenum as filenum from (select tagname as tagname, filenum as filenum from tagsbyfile where tagname = 'computer')selecttagt inner join exifmodel on selecttagt.filenum = exifmodel.filenum)modelt group by modelval order by modelcount desc;
+'''
 
 #def closedb():
     #Close connection to redshift
 
+
+def runQuery():
+   #SQL
+   my_query = "select count(*) as modelcount, modelt.modelval as modelval from (select exifmodel.val as modelval, selecttagt.filenum as filenum from  (select tagname as tagname, filenum as filenum from tagsbyfile where tagname = 'computer')selecttagt inner join exifmodel on selecttagt.filenum = exifmodel.filenum)modelt group by modelval order by modelcount desc;"
+   cur = pconn.cursor()
+   cur.execute(my_query)
+   mydict = cur.fetchall()
+   import pandas as pd
+   df = pd.DataFrame(mydict)
+   print df
+   return df
+
+
+
 '''
 Here I plan to implement  the api/ queries?
 '''
-
+runQuery()
 
 @app.route('/')
 def homepage():
+   connectdb()
    return render_template('index.html')
    
 
