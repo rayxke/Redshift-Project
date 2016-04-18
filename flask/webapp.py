@@ -9,6 +9,8 @@ from flask import Flask, render_template, url_for, jsonify, request
 import json
 import boto
 import psycopg2
+import pygal
+from pygal.style import CleanStyle
 app = Flask(__name__)
 
 
@@ -47,9 +49,6 @@ select count(*) as totalcount, joinedtable.makeval as makeval, joinedtable.model
 	inner join exifmodel on selectedtagtable.filenum = exifmodel.filenum )joinedtable 
 group by makeval, modelval order by totalcount desc limit 10;
 '''
-
-#def closedb():
-    #Close connection to redshift
 
 def constructQuery(tag,fields):
 
@@ -94,25 +93,48 @@ def runQuery(query):
    # df.set_index('0').to_dict()
    # return df
 
-
-'''
-Here I plan to implement  the api/ queries?
-'''
-#runQuery()
-
 @app.route('/')
 def homepage():
    #connectdb()
-   return render_template('index.html')
-   
+   return render_template('index.html',graph15 = draw_bar_graph("Field Counts from Exif"))
+
+@app.route('/graph')
+def draw_bar_graph(title):
+    
+    bar_chart = pygal.StackedBar(width=900, height=600,
+                          explicit_size=True, title=title, x_label_rotation=40, style=CleanStyle)
+    bar_chart.x_labels = map(str, range(11))
+    bar_chart.add('Goodslo',[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55])
+    bar_chart.add('Padovan', [1, 1, 1, 2, 2, 3, 4, 5, 7, 9, 12]) 
+
+    html = """
+        %s
+        """ % bar_chart.render()
+    return html.decode("utf8")
 
 @app.route('/search',methods=['GET'])
 def search_data():
+  fieldholder = ['make','model', 'exposure', 'isospeed','aperture','shutterspeed','flash']
+
   tag = request.args.get('tag')
   make = request.args.get('make')
   model = request.args.get('model')
+  exposure = request.args.get('exposure')
+  isospeed = request.args.get('isospeed')
+  aperture = request.args.get('aperture')
+  shutterspeed = request.args.get('shutterspeed')
+  flash = request.args.get('flash')
 
-  constructed_tag = constructQuery(tag,['make','model'])
+  checkedholder = [make,model,exposure,isospeed,aperture,shutterspeed,flash]
+  fieldschecked = []
+
+  for index in range(len(fieldholder)):
+  	if(checkedholder[index]=='on'):
+  		fieldschecked.append(fieldholder[index])
+
+
+
+  constructed_tag = constructQuery(tag,fieldschecked)
   queryresult = runQuery(constructed_tag)
 
   #restructure the result so that it is a jsonable structure
