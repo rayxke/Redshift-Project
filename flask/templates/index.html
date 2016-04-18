@@ -1,27 +1,68 @@
-<!doctype html>
-<title>Flickr Queries</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-<div class="page">
-<h1>Flickr Recs</h1>
-  <div class="metanav">
-    <p>This webpage recommends cameras to users based on user input.
-    </p>
-     <form action="/search" method="get">
-        Tag: <input type="text" name="tag" value="Food"><br>
-        Fields: <br>
-        		<input type=checkbox name="make">Make<BR> 
-        		<input type=checkbox name="model">Model<BR> 
-        		<input type=checkbox name="exposure">Exposure<br>
-        		<input type=checkbox name="isospeed">ISO Speed<br>
-        		<input type=checkbox name="aperture">Aperture<br>
-        		<input type=checkbox name="shutterspeed">Shutter Speed<br>
-        		<input type=checkbox name="flash">Flash<br>
 
-             <input type="submit" value="Submit">
-     </form>
-  </div>
-   <center> <img src="/static/flickr-logo.png" width="300" height="150" alt="flickr"> </center>
-</div>
-<center>
-<p>By Shivam Agarwal, Jason Mar, Keary Mobley, Saketh Poda, Carlos Ramirez, Soma Yamaoka</p>
-</center>
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Flickr Exif Recommendations</title>
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+</head>
+ 
+<body>
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="/">Home</a>
+                    </li>
+                    <li role="presentation"><a href="https://github.com/rayxke/Redshift-Project">Github</a>
+                    </li>
+                   <!--  <li role="presentation"><a href="">Data</a>
+                    </li> -->
+                </ul>
+            </nav>
+            <h3 class="text-muted">Flickr Exif Interactive Querying</h3>
+        </div>
+        <div class="row marketing" style="margin-top: 0;">
+             <form action="/search" method="get">
+              <div class="form-group">
+                <label for="phototag">Photo Tag</label>
+                <input type="text" class="form-control" name="tag" placeholder="Input your tag here...">
+              </div>
+              <div class="checkbox">
+                <label>
+                  	<div class="col-md-8"><input type=checkbox name="make">Make</div>
+        			<div class="col-md-4"><input type=checkbox name="model">Model</div>
+        			<div class="col-md-8"><input type=checkbox name="exposure">Exposure</div>
+	        		<div class="col-md-4"><input type=checkbox name="isospeed">ISO Speed</div>
+	        		<div class="col-md-8"><input type=checkbox name="aperture">Aperture</div>
+	        		<div class="col-md-4"><input type=checkbox name="shutterspeed">Shutter Speed</div>
+	        		<div class="col-md-8"><input type=checkbox name="flash">Flash</div>
+                </label>
+              </div>
+              <div class="col-md-8"><button type="reset" class="btn btn-primary" id="userUpdate">Clear Selections</button></div>
+              <div class="col-md-1"><button type="submit" class="btn btn-success" value="Submit">Submit</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- graph -->
+
+    <div class="container-fluid">
+        <div class="jumbotron" style="background-color: white; padding-top: 0; padding-bottom: 0;">	
+            {% block content %} 
+            <div id='graph15'>{{graph15|safe}}</div>
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- footer  -->
+    <div class="container">
+        <footer class="footer">
+        	 <center> <img src="/static/flickr-logo.png" width="300" height="150" alt="flickr"> </center>
+            <p>&copy; ECE4813 Group 6: Shivam Agarwal, Jason Mar, Keary Mobley, Saketh Poda, Carlos Ramirez, Soma Yamaoka</p>
+        </footer>
+    </div>
+</body>
+ 
+</html>
