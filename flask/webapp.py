@@ -50,7 +50,7 @@ select count(*) as totalcount, joinedtable.makeval as makeval, joinedtable.model
 group by makeval, modelval order by totalcount desc limit 10;
 '''
 
-def constructQuery(tag,fields):
+def constructQuery(tag,numresults,fields):
 
 	count_section = "select count(*) as totalcount, joinedtable." 
 	selectjoin_section = "(" + "select exif"
@@ -73,7 +73,7 @@ def constructQuery(tag,fields):
 			group_section += ", "
 
 	innerjoin_section += ")joinedtable"
-	group_section += "order by totalcount desc limit 10;"
+	group_section += "order by totalcount desc limit " + str(numresults) + ";"
 
 	basic_tag_query = "(select tagname as tagname, filenum as filenum from tagsbyfile where tagname ="+"\'"+tag.lower()+"\'"+")selectedtagtable "
 	
@@ -117,6 +117,8 @@ def search_data():
   fieldholder = ['make','model', 'exposure', 'isospeed','aperture','shutterspeed','flash']
 
   tag = request.args.get('tag')
+  numresults = request.args.get('numresults')
+
   make = request.args.get('make')
   model = request.args.get('model')
   exposure = request.args.get('exposure')
@@ -134,7 +136,7 @@ def search_data():
 
 
 
-  constructed_tag = constructQuery(tag,fieldschecked)
+  constructed_tag = constructQuery(tag,numresults,fieldschecked)
   queryresult = runQuery(constructed_tag)
 
   #restructure the result so that it is a jsonable structure
