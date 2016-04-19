@@ -2,7 +2,6 @@
      Script Name: webapp.py
      Purpose: ECE 4813 - Cloud Computing Project
      Description: Flask Front-End for Interactive Query Project
-     Authors: Shivam Agarwal, Jason Mar, Keary Mobley, Saketh Poda, Carlos Ramirez, Soma Yamaoka
 '''
 
 from flask import Flask, render_template, url_for, jsonify, request
@@ -46,7 +45,7 @@ pconn = psycopg2.connect("host= '"+addr+"' port='5439' dbname='"+databasename+"'
 '''
 
 #Constructs the SQL Query based on the tag, number of results, and fields selected
-def constructQuery(tag,numresults,fields):
+def constructQuery(tag,numresults,fields,exact):
 
 	'''Example Query
 		select count(*) as totalcount, joinedtable.makeval as makeval, joinedtable.modelval as modelval from 
@@ -61,6 +60,14 @@ def constructQuery(tag,numresults,fields):
 	innerjoin_section = ""
 	group_section = " group by "
 
+	fixedtag = ""
+	if exact == None:
+		fixedtag = "="+"\'"+tag.lower()+"\'"
+	else:
+		fixedtag = " LIKE "+"\'" +"%"+tag.lower()+ +"%"+"\'"
+
+
+	print fixedtag
 	for index in range(len(fields)):
 		count_section += fields[index] + "val" + " as " + fields[index] + "val"
 		selectjoin_section += fields[index] + ".val" + " as " + fields[index] + "val"
@@ -79,7 +86,7 @@ def constructQuery(tag,numresults,fields):
 	innerjoin_section += ")joinedtable"
 	group_section += "order by totalcount desc limit " + str(numresults) + ";"
 
-	basic_tag_query = "(select tagname as tagname, filenum as filenum from tagsbyfile where tagname ="+"\'"+tag.lower()+"\'"+")selectedtagtable "
+	basic_tag_query = "(select tagname as tagname, filenum as filenum from tagsbyfile where tagname" +fixedtag +")selectedtagtable "
 	
 	query = count_section + selectjoin_section + basic_tag_query + innerjoin_section + group_section
 
@@ -88,17 +95,13 @@ def constructQuery(tag,numresults,fields):
 #gets the checked fields from the html and returns a list of fields checked
 def get_checked_fields():
 
-	fieldholder = ['make','model', 'exposure', 'isospeed','aperture','shutterspeed','flash']
+	fieldholder = ['make','model', 'exposure', 'isospeed','aperture','shutterspeed','flash', 'colorspace','compression','contrast','focallength','orientation','saturation','scenecapturetype','sharpness','software','subjectdistancerange','whitebalance']
 	tag = request.args.get('tag')
 	numresults = request.args.get('numresults')
-	make = request.args.get('make')
-	model = request.args.get('model')
-	exposure = request.args.get('exposure')
-	isospeed = request.args.get('isospeed')
-	aperture = request.args.get('aperture')
-	shutterspeed = request.args.get('shutterspeed')
-	flash = request.args.get('flash')
-	checkedholder = [make,model,exposure,isospeed,aperture,shutterspeed,flash]
+	checkedholder = []
+	for index in range(len(fieldholder)):
+		checkedholder.append(request.args.get(fieldholder[index]))
+
 	fieldschecked = []
 
 	for index in range(len(fieldholder)):
@@ -111,8 +114,9 @@ def search_data():
 
 	tag = request.args.get('tag')
 	numresults = request.args.get('numresults')
+	exact = request.args.get('exact')
 	fieldschecked = get_checked_fields()
-	constructed_tag = constructQuery(tag,numresults,fieldschecked)
+	constructed_tag = constructQuery(tag,numresults,fieldschecked,exact)
 	queryresult = runQuery(constructed_tag)
 	print queryresult
 	#restructure the result so that it is a jsonable structure
@@ -156,7 +160,7 @@ def homepage(result=None):
 @app.route('/graph')
 def draw_bar_graph(data):
 
-	bar_chart = pygal.Bar(width=900, height=600, explicit_size=True, x_label_rotation=40, style=CleanStyle,truncate_legend=-1,legend_at_bottom=True, legend_at_bottom_columns=1)
+	bar_chart = pygal.Bar(width=900, height=900, explicit_size=True, x_label_rotation=40, style=CleanStyle,truncate_legend=-1,legend_at_bottom=True, legend_at_bottom_columns=1)
 	if (data == None):
 		bar_chart.title = "Please input fields above"
 	else:
