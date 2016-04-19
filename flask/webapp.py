@@ -42,16 +42,20 @@ pconn = psycopg2.connect("host= '"+addr+"' port='5439' dbname='"+databasename+"'
 
 
 '''
-select count(*) as totalcount, joinedtable.makeval as makeval, joinedtable.modelval as modelval from 
-(select exifmake.val as makeval, exifmodel.val as modelval, selectedtagtable.filenum as filenum from 
-	(select tagname as tagname, filenum as filenum from tagsbyfile where tagname ='food')selectedtagtable 
-	inner join exifmake on selectedtagtable.filenum = exifmake.filenum 
-	inner join exifmodel on selectedtagtable.filenum = exifmodel.filenum )joinedtable 
-group by makeval, modelval order by totalcount desc limit 10;
+
 '''
 
+#Constructs the SQL Query based on the tag, number of results, and fields selected
 def constructQuery(tag,numresults,fields):
 
+	'''Example Query
+		select count(*) as totalcount, joinedtable.makeval as makeval, joinedtable.modelval as modelval from 
+		(select exifmake.val as makeval, exifmodel.val as modelval, selectedtagtable.filenum as filenum from 
+		(select tagname as tagname, filenum as filenum from tagsbyfile where tagname ='food')selectedtagtable 
+		inner join exifmake on selectedtagtable.filenum = exifmake.filenum 
+		inner join exifmodel on selectedtagtable.filenum = exifmodel.filenum )joinedtable 
+		group by makeval, modelval order by totalcount desc limit 10;
+	'''
 	count_section = "select count(*) as totalcount, joinedtable." 
 	selectjoin_section = "(" + "select exif"
 	innerjoin_section = ""
@@ -81,79 +85,92 @@ def constructQuery(tag,numresults,fields):
 
 	return query
 
+#gets the checked fields from the html and returns a list of fields checked
+def get_checked_fields():
+
+	fieldholder = ['make','model', 'exposure', 'isospeed','aperture','shutterspeed','flash']
+	tag = request.args.get('tag')
+	numresults = request.args.get('numresults')
+	make = request.args.get('make')
+	model = request.args.get('model')
+	exposure = request.args.get('exposure')
+	isospeed = request.args.get('isospeed')
+	aperture = request.args.get('aperture')
+	shutterspeed = request.args.get('shutterspeed')
+	flash = request.args.get('flash')
+	checkedholder = [make,model,exposure,isospeed,aperture,shutterspeed,flash]
+	fieldschecked = []
+
+	for index in range(len(fieldholder)):
+		if(checkedholder[index]=='on'):
+			fieldschecked.append(fieldholder[index])
+	return fieldschecked
+
+#queries for data and restructures the data suitable for JSON
+def search_data():
+
+	tag = request.args.get('tag')
+	numresults = request.args.get('numresults')
+	fieldschecked = get_checked_fields()
+	constructed_tag = constructQuery(tag,numresults,fieldschecked)
+	queryresult = runQuery(constructed_tag)
+	print queryresult
+	#restructure the result so that it is a jsonable structure
+	restructured_result = []
+	for index in range(len(queryresult)):
+  		occurlist = []
+  		occurences = int(queryresult[index][0])
+  		fieldlist = []
+  		for listindex in range(1,len(queryresult[index])):
+  			fieldlist.append(queryresult[index][listindex])
+  		occurlist.append(occurences)
+  		occurlist.append(fieldlist)
+  		restructured_result.append(occurlist)
+  	print restructured_result
+
+  	return restructured_result
+
+#runs the query with psycopg2
 def runQuery(query):
    #SQL
    cur = pconn.cursor()
    cur.execute(query)
    mylist = cur.fetchall()
-   # sortdict = sorted(mydict, key=lambda x: x[0],reverse=True)
    return mylist
    # import pandas as pd
    # df = pd.DataFrame(mydict)
    # df.set_index('0').to_dict()
    # return df
 
-@app.route('/')
-def homepage():
-   #connectdb()
-   return render_template('index.html',graph15 = draw_bar_graph("Field Counts from Exif"))
 
+#index page
+@app.route('/',methods = ['GET','POST'])
+def homepage(result=None):
+	if request.args.get('tag',None):
+		data = search_data()
+		return render_template('index.html',graph15 = draw_bar_graph(data))
+	else:
+		return render_template('index.html',graph15 = draw_bar_graph(None))
+
+#generates the pygal graph
 @app.route('/graph')
-def draw_bar_graph(title):
-    
-    bar_chart = pygal.StackedBar(width=900, height=600,
-                          explicit_size=True, title=title, x_label_rotation=40, style=CleanStyle)
-    bar_chart.x_labels = map(str, range(11))
-    bar_chart.add('Goodslo',[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55])
-    bar_chart.add('Padovan', [1, 1, 1, 2, 2, 3, 4, 5, 7, 9, 12]) 
+def draw_bar_graph(data):
 
-    html = """
-        %s
-        """ % bar_chart.render()
-    return html.decode("utf8")
+	bar_chart = pygal.Bar(width=900, height=600, explicit_size=True, x_label_rotation=40, style=CleanStyle,truncate_legend=-1,legend_at_bottom=True, legend_at_bottom_columns=1)
+	if (data == None):
+		bar_chart.title = "Please input fields above"
+	else:
+		fieldschecked = get_checked_fields()
+		bar_chart.title = ", ".join(fieldschecked)
+		for index in range(len(data)):
+			label = ""
+			for labelindex in range(len(data[index][1])):
+				label += data[index][1][labelindex] + " "
+			bar_chart.add(label,data[index][0])
 
-@app.route('/search',methods=['GET'])
-def search_data():
-  fieldholder = ['make','model', 'exposure', 'isospeed','aperture','shutterspeed','flash']
+	html = """%s""" % bar_chart.render()
+	return html.decode("utf8")
 
-  tag = request.args.get('tag')
-  numresults = request.args.get('numresults')
-
-  make = request.args.get('make')
-  model = request.args.get('model')
-  exposure = request.args.get('exposure')
-  isospeed = request.args.get('isospeed')
-  aperture = request.args.get('aperture')
-  shutterspeed = request.args.get('shutterspeed')
-  flash = request.args.get('flash')
-
-  checkedholder = [make,model,exposure,isospeed,aperture,shutterspeed,flash]
-  fieldschecked = []
-
-  for index in range(len(fieldholder)):
-  	if(checkedholder[index]=='on'):
-  		fieldschecked.append(fieldholder[index])
-
-
-
-  constructed_tag = constructQuery(tag,numresults,fieldschecked)
-  queryresult = runQuery(constructed_tag)
-
-  #restructure the result so that it is a jsonable structure
-  restructured_result = []
-  for index in range(len(queryresult)):
-  	occurlist = []
-  	occurences = int(queryresult[index][0])
-  	fieldlist = []
-  	for listindex in range(1,len(queryresult[index])):
-  		fieldlist.append(queryresult[index][listindex])
-  	occurlist.append(occurences)
-  	occurlist.append(fieldlist)
-  	restructured_result.append(occurlist)
-  
-  print restructured_result
-
-  return jsonify(restructured_result)
 
 #Run the app.
 
