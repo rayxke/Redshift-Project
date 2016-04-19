@@ -6,7 +6,7 @@ Project for ECE-4813
 - [x]  Load Data to RedShift
 - [x]  MapReduce Program
 - [x]  Develop SQL Query
-- [ ]  Flask App
+- [x]  Flask App
 - [ ]  PowerPoint Presentation
 - [ ]  Project Report
 
