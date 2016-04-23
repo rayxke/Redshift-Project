@@ -64,7 +64,7 @@ def constructQuery(tag,numresults,fields,exact):
 	if exact == None:
 		fixedtag = "="+"\'"+tag.lower()+"\'"
 	else:
-		fixedtag = " LIKE "+"\'" +"%"+tag.lower()+ +"%"+"\'"
+		fixedtag = " LIKE "+"\'" +"%"+tag.lower()+"%"+"\'"
 
 
 	print fixedtag
