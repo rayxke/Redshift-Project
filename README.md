@@ -1,5 +1,6 @@
 # Redshift-Project
 Project for ECE-4813
+LINK: http://ec2-52-90-172-165.compute-1.amazonaws.com/
 
 ##Task List
 - [x] Python Script to merge data to one csv file
@@ -7,8 +8,8 @@ Project for ECE-4813
 - [x]  MapReduce Program
 - [x]  Develop SQL Query
 - [x]  Flask App
-- [ ]  PowerPoint Presentation
-- [ ]  Project Report
+- [x]  PowerPoint Presentation
+- [x]  Project Report
 
 ##Assignments
 |Task| Team Member|
