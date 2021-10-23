@@ -1,8 +1,9 @@
 # Redshift-Project
 Project for ECE-4813
-LINK: http://ec2-52-90-172-165.compute-1.amazonaws.com/
 
-##Task List
+[WEBSITE LINK](http://ec2-52-90-172-165.compute-1.amazonaws.com/)
+
+## Task List
 - [x] Python Script to merge data to one csv file
 - [x]  Load Data to RedShift
 - [x]  MapReduce Program
@@ -11,7 +12,7 @@ LINK: http://ec2-52-90-172-165.compute-1.amazonaws.com/
 - [x]  PowerPoint Presentation
 - [x]  Project Report
 
-##Assignments
+## Assignments
 |Task| Team Member|
 |:---:|:---:|
 |Format Data| Jason|
